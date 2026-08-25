@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The PRINCE2 Commonplace Book</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cinzel:wght@500;600&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+  :root{
+    --ink:#0f0c09;
+    --ink-2:#1b1510;
+    --panel:#221a13;
+    --panel-2:#2a2016;
+    --leather:#1a130d;
+    --line: rgba(198,161,91,0.22);
+    --gold:#c6a15b;
+    --gold-bright:#e8c988;
+    --gold-dim: #8a713f;
+    --oxblood:#7a2b34;
+    --oxblood-bright:#a3414c;
+    --parchment:#e9dcbf;
+    --parchment-dim:#b9a97f;
+    --moss:#7c8f56;
+    --moss-bright:#a3bb6c;
+    --shadow: 0 10px 34px rgba(0,0,0,0.55);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+
+  @keyframes flicker{
+    0%,100%{ opacity:1; }
+    42%{ opacity:0.94; }
+    50%{ opacity:1; }
+    58%{ opacity:0.9; }
+    73%{ opacity:1; }
+  }
+
+  body{
+    background:
+      radial-gradient(ellipse 700px 500px at 50% 0%, #2a1f14 0%, transparent 60%),
+      radial-gradient(ellipse at top, #201810 0%, var(--ink) 55%, #080604 100%);
+    color:var(--parchment);
+    font-family:'EB Garamond', serif;
+    min-height:100vh;
+    padding:26px 16px 90px;
+    position:relative;
+    animation: flicker 7s infinite ease-in-out;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      repeating-linear-gradient(115deg, rgba(0,0,0,0.15) 0px, transparent 1.5px, transparent 3px);
+    background-size:3px 3px, 5px 5px;
+    mix-blend-mode:overlay;
+    opacity:0.6;
+  }
+
+  .vignette{
+    position:fixed; inset:0; pointer-events:none;
+    box-shadow: inset 0 0 260px rgba(0,0,0,0.8), inset 0 0 60px rgba(0,0,0,0.5);
+  }
+
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    position:relative;
+    padding:34px 30px 44px;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.12), transparent 90px),
+      var(--leather);
+    border:1px solid rgba(198,161,91,0.3);
+    border-radius:3px;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.6),
+      0 30px 70px rgba(0,0,0,0.65),
+      inset 0 0 90px rgba(0,0,0,0.55),
+      inset 0 0 0 6px rgba(8,6,4,0.5);
+  }
+  .wrap::before{
+    content:"";
+    position:absolute; inset:9px;
+    border:1px solid rgba(198,161,91,0.28);
+    pointer-events:none;
+  }
+  .corner{
+    position:absolute;
+    width:26px; height:26px;
+    pointer-events:none;
+    color:var(--gold-dim);
+    font-size:20px;
+    line-height:1;
+    opacity:0.75;
+  }
+  .corner.tl{ top:14px; left:14px; }
+  .corner.tr{ top:14px; right:14px; transform:scaleX(-1); }
+  .corner.bl{ bottom:14px; left:14px; transform:scaleY(-1); }
+  .corner.br{ bottom:14px; right:14px; transform:scale(-1,-1); }
+  .corner svg{ width:100%; height:100%; }
+
+  /* ---------- Dust motes ---------- */
+  .motes{
+    position:fixed; inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:1;
+  }
+  .mote{
+    position:absolute;
+    bottom:-4vh;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(232,201,136,0.85), rgba(232,201,136,0) 70%);
+    opacity:0;
+    animation-name:drift-up;
+    animation-timing-function:ease-in-out;
+    animation-iteration-count:infinite;
+  }
+  @keyframes drift-up{
+    0%{ transform:translate(0,0); opacity:0; }
+    8%{ opacity:0.7; }
+    50%{ transform:translate(var(--drift, 12px), -52vh); opacity:0.55; }
+    92%{ opacity:0.25; }
+    100%{ transform:translate(calc(var(--drift, 12px) * 1.6), -104vh); opacity:0; }
+  }
+
+  /* ---------- Reading-corner signature ---------- */
+  .study-scene{
+    display:flex; align-items:flex-end; justify-content:center;
+    gap:18px;
+    margin:2px 0 16px;
+  }
+  .study-scene svg{
+    overflow:visible;
+  }
+  .scene-candle .flame{
+    transform-origin:50% 100%;
+    animation:flame-dance 2.6s ease-in-out infinite;
+  }
+  @keyframes flame-dance{
+    0%,100%{ transform:scaleY(1) rotate(0deg); }
+    30%{ transform:scaleY(1.08) rotate(-3deg); }
+    60%{ transform:scaleY(0.94) rotate(2deg); }
+    80%{ transform:scaleY(1.04) rotate(-1deg); }
+  }
+  .scene-candle .glow{
+    animation:flame-dance 2.6s ease-in-out infinite;
+    opacity:0.55;
+  }
+  .scene-cup .steam{
+    stroke:var(--gold-dim);
+    stroke-width:1.3;
+    fill:none;
+    stroke-linecap:round;
+    opacity:0;
+    animation:steam-rise 3.4s ease-in infinite;
+  }
+  .scene-cup .steam.s2{ animation-delay:0.9s; }
+  .scene-cup .steam.s3{ animation-delay:1.8s; }
+  @keyframes steam-rise{
+    0%{ opacity:0; transform:translateY(4px) scaleY(0.85); }
+    20%{ opacity:0.65; }
+    75%{ opacity:0.3; }
+    100%{ opacity:0; transform:translateY(-10px) scaleY(1.15); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .mote, .scene-candle .flame, .scene-candle .glow, .scene-cup .steam, body{
+      animation:none !important;
+    }
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    text-align:center;
+    margin-bottom:30px;
+  }
+  .fleuron{
+    font-family:'Cinzel Decorative', serif;
+    font-size:22px;
+    color:var(--gold-dim);
+    margin-bottom:8px;
+    letter-spacing:0.1em;
+  }
+  .eyebrow{
+    font-family:'Cinzel', serif;
+    letter-spacing:0.36em;
+    font-size:11px;
+    color:var(--gold);
+    text-transform:uppercase;
+    opacity:0.85;
+  }
+  h1{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:46px;
+    margin:12px 0 8px;
+    color:var(--parchment);
+    text-shadow: 0 2px 22px rgba(198,161,91,0.22), 0 1px 0 rgba(0,0,0,0.4);
+    letter-spacing:0.01em;
+  }
+  .subtitle{
+    font-family:'IM Fell English', serif;
+    font-size:16.5px;
+    color:var(--parchment-dim);
+    font-style:italic;
+  }
+  .rule{
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    width:260px; margin:24px auto 0;
+    color:var(--gold-dim);
+  }
+  .rule::before, .rule::after{
+    content:""; flex:1; height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold));
+  }
+  .rule::after{ background:linear-gradient(90deg, var(--gold), transparent); }
+  .rule .diamond{
+    width:6px; height:6px;
+    border:1px solid var(--gold);
+    transform:rotate(45deg);
+    flex-shrink:0;
+  }
+
+  /* ---------- Seal / progress ---------- */
+  .seal-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:28px;
+    margin:34px 0 8px;
+    flex-wrap:wrap;
+  }
+  .seal{
+    width:120px; height:120px;
+    border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    background:radial-gradient(circle at 38% 32%, #3f2717, #1a0f09 72%);
+    box-shadow:
+      0 0 0 4px var(--ink),
+      0 0 0 5px var(--line),
+      0 0 26px rgba(198,161,91,0.18),
+      var(--shadow);
+    flex-shrink:0;
+  }
+  .seal::before{
+    content:"";
+    position:absolute; inset:7px;
+    border-radius:50%;
+    border:1px dashed rgba(198,161,91,0.5);
+  }
+  .seal::after{
+    content:"❦";
+    position:absolute;
+    bottom:-11px;
+    font-family:'Cinzel Decorative', serif;
+    font-size:15px;
+    color:var(--gold-dim);
+    background:var(--leather);
+    padding:0 6px;
+  }
+  .seal .count{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:700;
+    font-size:30px;
+    color:var(--gold-bright);
+    line-height:1;
+  }
+  .seal .of{
+    font-family:'Cinzel', serif;
+    font-size:9px;
+    letter-spacing:0.15em;
+    color:var(--parchment-dim);
+    margin-top:4px;
+  }
+  .progress-meta{
+    max-width:320px;
+  }
+  .progress-meta .pct{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:22px;
+    color:var(--parchment);
+    margin-bottom:6px;
+  }
+  .bar-track{
+    width:100%; height:6px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--oxblood), var(--gold));
+    width:0%;
+    transition:width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-meta .note{
+    font-size:13px; color:var(--parchment-dim); margin-top:8px; font-style:italic;
+  }
+
+  /* ---------- Calendar ---------- */
+  .card{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.015), transparent 30%),
+      linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line);
+    border-radius:2px;
+    box-shadow:var(--shadow), inset 0 0 40px rgba(0,0,0,0.35);
+    padding:30px 26px;
+    margin:50px 0;
+    position:relative;
+  }
+  .card::after{
+    content:"";
+    position:absolute; inset:6px;
+    border:1px solid rgba(198,161,91,0.14);
+    pointer-events:none;
+  }
+  .card-title{
+    font-family:'Cinzel', serif;
+    font-size:12px;
+    letter-spacing:0.28em;
+    text-transform:uppercase;
+    color:var(--gold);
+    text-align:center;
+    margin-bottom:20px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .card-title::before, .card-title::after{
+    content:"◆"; font-size:6px; color:var(--gold-dim);
+  }
+  .cal-nav{
+    display:flex; align-items:center; justify-content:center;
+    gap:18px; margin-bottom:14px;
+  }
+  .cal-nav button{
+    background:none; border:1px solid var(--line); color:var(--gold);
+    font-family:'Cormorant Garamond', serif; font-size:16px;
+    width:28px; height:28px; border-radius:50%;
+    cursor:pointer; transition:all .2s;
+  }
+  .cal-nav button:hover{background:var(--oxblood); border-color:var(--oxblood-bright); color:var(--gold-bright);}
+  .cal-month{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic; font-size:19px; color:var(--parchment);
+    min-width:170px; text-align:center;
+  }
+  .cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+  }
+  .cal-dow{
+    text-align:center; font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:0.1em; color:var(--parchment-dim); padding-bottom:6px;
+  }
+  .cal-day{
+    aspect-ratio:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border-radius:4px;
+    font-size:12.5px;
+    color:var(--parchment-dim);
+    position:relative;
+    background:rgba(0,0,0,0.15);
+    border:1px solid transparent;
+  }
+  .cal-day.empty{background:none;}
+  .cal-day.today{border-color:var(--gold); color:var(--gold-bright);}
+  .cal-day .mark{
+    margin-top:2px; font-size:11px; line-height:1;
+  }
+  .cal-day.has-dot .mark{color:var(--moss-bright);}
+  .cal-day.has-star .mark{color:var(--gold-bright); font-size:13px;}
+  .cal-legend{
+    display:flex; justify-content:center; gap:26px; margin-top:16px;
+    font-size:12px; color:var(--parchment-dim);
+  }
+  .cal-legend span{display:flex; align-items:center; gap:6px;}
+  .legend-dot{color:var(--moss-bright);}
+  .legend-star{color:var(--gold-bright);}
+
+  /* ---------- Ledger / lessons ---------- */
+  .ledger{
+    position:relative;
+    padding-left:26px;
+  }
+  .ribbon{
+    position:absolute;
+    left:0; top:0;
+    width:4px;
+    background:linear-gradient(180deg, var(--oxblood-bright), var(--oxblood) 85%, transparent);
+    border-radius:1px;
+    box-shadow:0 0 10px rgba(163,65,76,0.5);
+    transition:height 0.5s ease;
+  }
+  .ribbon::after{
+    content:"";
+    position:absolute; bottom:-9px; left:-6px;
+    border-left:8px solid transparent;
+    border-right:8px solid transparent;
+    border-top:9px solid var(--oxblood);
+  }
+
+  .iteration-heading{
+    font-family:'Cinzel', serif;
+    font-size:13px;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--gold-bright);
+    margin:56px 0 0;
+    display:flex; align-items:center; gap:14px;
+    cursor:pointer;
+    user-select:none;
+    padding:6px 4px;
+    border-radius:3px;
+    transition:background 0.2s ease;
+  }
+  .iteration-heading:hover{
+    background:rgba(198,161,91,0.06);
+  }
+  .iteration-heading .chev{
+    font-family:'Cormorant Garamond', serif;
+    color:var(--gold-dim);
+    font-size:16px;
+    display:inline-block;
+    transform:rotate(90deg);
+    transition:transform 0.3s ease;
+    flex-shrink:0;
+  }
+  .iteration-heading .chev.closed{
+    transform:rotate(0deg);
+  }
+  .iteration-heading .iter-tally{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    letter-spacing:0;
+    text-transform:none;
+    font-size:14px;
+    color:var(--parchment-dim);
+    flex-shrink:0;
+  }
+  .iteration-heading::after{
+    content:""; flex:1; height:1px;
+    background:linear-gradient(90deg, var(--gold), transparent);
+  }
+  .iteration-body{
+    display:grid;
+    grid-template-rows:1fr;
+    transition:grid-template-rows 0.35s ease;
+  }
+  .iteration-body.collapsed{
+    grid-template-rows:0fr;
+  }
+  .iteration-body .inner{
+    overflow:hidden;
+  }
+  .iteration-sub{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:18px;
+    color:var(--parchment);
+    margin:28px 0 8px 6px;
+    padding-bottom:4px;
+    border-bottom:1px solid rgba(198,161,91,0.15);
+  }
+
+  .lesson{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    padding:9px 10px;
+    border-radius:4px;
+    cursor:pointer;
+    transition:background 0.2s ease;
+    user-select:none;
+  }
+  .lesson:hover{background:rgba(198,161,91,0.06);}
+  .lesson .num{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:14px;
+    color:var(--gold-dim);
+    width:22px;
+    text-align:right;
+    flex-shrink:0;
+  }
+  .lesson .mark-box{
+    width:15px; height:15px;
+    border:1px solid var(--gold);
+    border-radius:1px;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    top:2px;
+    background:rgba(0,0,0,0.2);
+  }
+  .lesson .mark-box svg{
+    width:11px; height:11px;
+    opacity:0;
+    transform:scale(0.5);
+    transition:all 0.25s ease;
+  }
+  .lesson.done .mark-box{
+    background:var(--oxblood);
+    border-color:var(--oxblood-bright);
+  }
+  .lesson.done .mark-box svg{
+    opacity:1; transform:scale(1);
+  }
+  .lesson .title{
+    font-size:16.5px;
+    color:var(--parchment);
+    transition:color 0.2s, opacity 0.2s;
+    flex:1;
+  }
+  .lesson.done .title{
+    color:var(--parchment-dim);
+    opacity:0.7;
+    text-decoration:line-through;
+    text-decoration-color:rgba(198,161,91,0.4);
+    text-decoration-thickness:1px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    text-align:center;
+    margin-top:60px;
+    font-size:13px;
+    color:var(--parchment-dim);
+    font-family:'IM Fell English', serif;
+    font-style:italic;
+  }
+  footer .fleuron{
+    font-size:16px;
+    margin-bottom:10px;
+  }
+  .reset-link{
+    color:var(--oxblood-bright);
+    cursor:pointer;
+    text-decoration:underline;
+    text-decoration-style:dotted;
+    font-style:normal;
+    font-family:'Cinzel', serif;
+    font-size:10px;
+    letter-spacing:0.1em;
+  }
+
+  .loading{
+    text-align:center;
+    padding:120px 20px;
+    color:var(--parchment-dim);
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:20px;
+  }
+
+  @media (max-width:520px){
+    h1{font-size:33px;}
+    .seal{width:96px; height:96px;}
+    .seal .count{font-size:24px;}
+    .card{padding:20px 14px;}
+    .lesson .title{font-size:15px;}
+  }
+</style>
+</head>
+<body>
+<div class="vignette"></div>
+<div class="motes" id="motes"></div>
+<div class="wrap" id="app">
+  <div class="loading" id="loading">Unsealing your commonplace book…</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'progress';
+
+const ITERATIONS = [
+  { id:"iter1", title:"Iteration I", items: [
+    [1,"About this course"],
+    [2,"What is PRINCE2?"],
+    [3,"Project timeline"],
+    [4,"When to use PRINCE2"],
+    [5,"Project variables"],
+    [6,"Project context"],
+  ]},
+  { id:"iter2", title:"Iteration II", items: [
+    [7,"Business justification"],
+    [8,"Stakeholders engagement"],
+    [9,"Communications"],
+    [10,"Lessons learned"],
+    [11,"Monitoring and controlling"],
+    [12,"Quality management"],
+    [13,"Risk management"],
+    [14,"Issues and changes"],
+    [15,"Planning"],
+    [16,"Document management"],
+    [17,"Tailoring"],
+  ]},
+  { id:"iter3", title:"Iteration III", subsections: [
+    { sub:"People", items: [
+      [18,"Change management"],
+      [19,"Stakeholders and culture"],
+      [20,"Leading successful teams"],
+      [21,"Building a team"],
+      [22,"Communications"],
+    ]},
+    { sub:"Business case practice", items: [
+      [23,"Purpose"],
+      [24,"Guidance"],
+      [25,"Technique"],
+      [26,"Principles"],
+    ]},
+    { sub:"Organization practice", items: [
+      [27,"Purpose"],
+      [28,"Levels and team structure"],
+      [29,"Technique"],
+      [30,"Management products"],
+      [31,"Principles"],
+    ]},
+    { sub:"Plans practice", items: [
+      [32,"Purpose"],
+      [33,"Types of plan"],
+      [34,"Stages and work packages"],
+      [35,"Technique"],
+      [36,"Product-based planning"],
+      [37,"Management products"],
+      [38,"Principles"],
+    ]},
+    { sub:"Quality practice", items: [
+      [39,"Purpose"],
+      [40,"The 3 aspects"],
+      [41,"Management products"],
+      [42,"Technique"],
+      [43,"Principles"],
+    ]},
+    { sub:"Risk practice", items: [
+      [44,"Purpose"],
+      [45,"Key concepts"],
+      [46,"Overall project risk"],
+      [47,"Cause, event, and effect"],
+      [48,"Risk responses"],
+      [49,"Planning, analysis, and control"],
+      [50,"Culture"],
+      [51,"Technique"],
+      [52,"Management products"],
+      [53,"Principles"],
+    ]},
+    { sub:"Issues practice", items: [
+      [54,"Purpose"],
+      [55,"Types of issue"],
+      [56,"Change control"],
+      [57,"Technique"],
+      [58,"Management products"],
+      [59,"Principles"],
+    ]},
+    { sub:"Progress practice", items: [
+      [60,"Purpose"],
+      [61,"Delegation"],
+      [62,"Types of control"],
+      [63,"Reporting"],
+      [64,"Escalating"],
+      [65,"Technique"],
+      [66,"Management products"],
+      [67,"Principles"],
+    ]},
+    { sub:"Principles", items: [
+      [68,"Ensure continued business justification"],
+      [69,"Learn from experience"],
+      [70,"Defined roles, responsibilities, and relationships"],
+      [71,"Manage by exception"],
+      [72,"Manage by stages"],
+      [73,"Focus on products"],
+      [74,"Tailor to suit the project"],
+    ]},
+    { sub:"Processes", items: [
+      [75,"Starting up a project — purpose"],
+      [76,"Starting up a project — context"],
+      [77,"Initiating a project — purpose"],
+      [78,"Initiating a project — context"],
+      [79,"Directing a project — purpose"],
+      [80,"Directing a project — context"],
+      [81,"Controlling a stage — purpose"],
+      [82,"Controlling a stage — context"],
+      [83,"Managing product delivery — purpose"],
+      [84,"Managing product delivery — context"],
+      [85,"Managing a stage boundary — purpose"],
+      [86,"Managing a stage boundary — context"],
+      [87,"Closing a project — purpose"],
+      [88,"Closing a project — context"],
+      [89,"About the exam"],
+    ]},
+  ]},
+];
+
+const TOTAL = 89;
+const PRECHECKED = new Set([1,2,3,4,5,6,7,8,9,10,11,12]);
+
+function todayStr(d){
+  const dt = d || new Date();
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+}
+
+let state = {
+  lessons: {}, // id -> { done: bool, date: 'YYYY-MM-DD' | null }
+};
+
+let calView = new Date(); // month currently shown in calendar
+let collapsedIterations = {}; // iter.id -> bool, session-only fold state
+
+function toggleIteration(id){
+  collapsedIterations[id] = !collapsedIterations[id];
+  render();
+}
+
+function defaultState(){
+  const lessons = {};
+  for (let i=1;i<=TOTAL;i++){
+    lessons[i] = { done: PRECHECKED.has(i), date: null };
+  }
+  return { lessons };
+}
+
+async function loadState(){
+  try{
+    const result = await window.storage.get(STORAGE_KEY, false);
+    if (result && result.value){
+      const parsed = JSON.parse(result.value);
+      // merge to be safe against future lesson-count changes
+      const base = defaultState();
+      for (const k of Object.keys(base.lessons)){
+        if (parsed.lessons && parsed.lessons[k]) base.lessons[k] = parsed.lessons[k];
+      }
+      state = base;
+    } else {
+      state = defaultState();
+    }
+  }catch(e){
+    state = defaultState();
+  }
+}
+
+async function saveState(){
+  try{
+    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+    if (!result){
+      console.error('Storage operation failed');
+    }
+  }catch(e){
+    console.error('Could not save progress', e);
+  }
+}
+
+function completionsByDate(){
+  const map = {};
+  for (const id in state.lessons){
+    const l = state.lessons[id];
+    if (l.done && l.date){
+      if (!map[l.date]) map[l.date] = [];
+      map[l.date].push(id);
+    }
+  }
+  return map;
+}
+
+function doneCount(){
+  return Object.values(state.lessons).filter(l=>l.done).length;
+}
+
+function toggleLesson(id){
+  const l = state.lessons[id];
+  if (l.done){
+    l.done = false;
+    l.date = null;
+  } else {
+    l.done = true;
+    l.date = todayStr();
+  }
+  saveState();
+  render();
+}
+
+async function resetProgress(){
+  if (!confirm('Erase every mark in this commonplace book? This cannot be undone.')) return;
+  state = defaultState();
+  await saveState();
+  render();
+}
+
+function checkSvg(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="#e0c07f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,13 9,18 20,6"/></svg>';
+}
+
+function cornerSvg(){
+  return '<svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 26 L2 8 Q2 2 8 2 L26 2" /><circle cx="2" cy="2" r="2" fill="currentColor" stroke="none"/></svg>';
+}
+
+function renderCalendar(){
+  const year = calView.getFullYear();
+  const month = calView.getMonth();
+  const monthName = calView.toLocaleString('en-US', { month:'long' });
+  const firstDay = new Date(year, month, 1);
+  const startWeekday = firstDay.getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const comps = completionsByDate();
+  const today = todayStr();
+
+  let cells = '';
+  const dows = ['S','M','T','W','T','F','S'];
+  let dowHtml = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  for (let i=0;i<startWeekday;i++){
+    cells += '<div class="cal-day empty"></div>';
+  }
+  for (let d=1; d<=daysInMonth; d++){
+    const dateStr = year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const count = comps[dateStr] ? comps[dateStr].length : 0;
+    let cls = 'cal-day';
+    let mark = '';
+    if (dateStr === today) cls += ' today';
+    if (count > 0 && count < 5){ cls += ' has-dot'; mark = '<div class="mark">●</div>'; }
+    else if (count >= 5){ cls += ' has-star'; mark = '<div class="mark">★</div>'; }
+    cells += `<div class="${cls}" title="${count>0 ? count+' lesson'+(count>1?'s':'')+' completed' : ''}">${d}${mark}</div>`;
+  }
+
+  return `
+    <div class="card">
+      <div class="card-title">Days of Study</div>
+      <div class="cal-nav">
+        <button onclick="changeMonth(-1)">‹</button>
+        <div class="cal-month">${monthName} ${year}</div>
+        <button onclick="changeMonth(1)">›</button>
+      </div>
+      <div class="cal-grid">
+        ${dowHtml}
+        ${cells}
+      </div>
+      <div class="cal-legend">
+        <span class="legend-dot">● &nbsp;fewer than 5 lessons</span>
+        <span class="legend-star">★ &nbsp;5 lessons or more</span>
+      </div>
+    </div>
+  `;
+}
+
+function changeMonth(delta){
+  calView = new Date(calView.getFullYear(), calView.getMonth()+delta, 1);
+  render();
+}
+
+function lessonRow(id, title){
+  const l = state.lessons[id];
+  const done = l && l.done;
+  return `
+    <div class="lesson ${done?'done':''}" onclick="toggleLesson(${id})">
+      <span class="num">${id}.</span>
+      <span class="mark-box">${checkSvg()}</span>
+      <span class="title">${title}</span>
+    </div>
+  `;
+}
+
+function iterationTally(iter){
+  let ids = [];
+  if (iter.items) ids = iter.items.map(i=>i[0]);
+  if (iter.subsections) ids = iter.subsections.flatMap(s=>s.items.map(i=>i[0]));
+  const done = ids.filter(id => state.lessons[id] && state.lessons[id].done).length;
+  return { done, total: ids.length };
+}
+
+function renderLedger(){
+  let html = '<div class="ledger" id="ledger">';
+  html += '<div class="ribbon" id="ribbon"></div>';
+
+  for (const iter of ITERATIONS){
+    const collapsed = !!collapsedIterations[iter.id];
+    const { done, total } = iterationTally(iter);
+
+    html += `
+      <div class="iteration-heading" onclick="toggleIteration('${iter.id}')">
+        <span class="chev ${collapsed?'closed':''}">›</span>
+        <span>${iter.title}</span>
+        <span class="iter-tally">${done} / ${total}</span>
+      </div>
+      <div class="iteration-body ${collapsed?'collapsed':''}"><div class="inner">
+    `;
+
+    if (iter.items){
+      for (const [id, title] of iter.items){
+        html += lessonRow(id, title);
+      }
+    }
+    if (iter.subsections){
+      for (const s of iter.subsections){
+        html += `<div class="iteration-sub">${s.sub}</div>`;
+        for (const [id, title] of s.items){
+          html += lessonRow(id, title);
+        }
+      }
+    }
+
+    html += `</div></div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function render(){
+  const done = doneCount();
+  const pct = Math.round((done/TOTAL)*100);
+
+  document.getElementById('app').innerHTML = `
+    <div class="corner tl">${cornerSvg()}</div>
+    <div class="corner tr">${cornerSvg()}</div>
+    <div class="corner bl">${cornerSvg()}</div>
+    <div class="corner br">${cornerSvg()}</div>
+
+    <header>
+      <div class="study-scene">
+        <svg class="scene-books" width="46" height="30" viewBox="0 0 46 30" fill="none" stroke="var(--gold-dim)" stroke-width="1.1">
+          <rect x="2" y="20" width="30" height="7" rx="0.5"/>
+          <rect x="5" y="14" width="24" height="6" rx="0.5"/>
+          <line x1="9" y1="14" x2="9" y2="20"/>
+          <line x1="21" y1="14" x2="21" y2="20"/>
+          <rect x="8" y="9" width="17" height="5" rx="0.5" transform="rotate(-3 8 9)"/>
+        </svg>
+        <svg class="scene-candle" width="20" height="42" viewBox="0 0 20 42" fill="none" stroke="var(--gold)" stroke-width="1.1">
+          <circle class="glow" cx="10" cy="8" r="9" fill="url(#candleglow)" stroke="none"/>
+          <defs>
+            <radialGradient id="candleglow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(232,201,136,0.55)"/>
+              <stop offset="100%" stop-color="rgba(232,201,136,0)"/>
+            </radialGradient>
+          </defs>
+          <path class="flame" d="M10 6 C 13 10, 12 14, 10 15 C 8 14, 7 10, 10 6 Z" fill="var(--gold-bright)" stroke="none"/>
+          <line x1="10" y1="15" x2="10" y2="18"/>
+          <rect x="5" y="18" width="10" height="20" rx="1"/>
+          <path d="M5 24 Q10 26 15 24" />
+          <path d="M5 30 Q10 32 15 30" />
+        </svg>
+        <svg class="scene-cup" width="34" height="30" viewBox="0 0 34 30" fill="none" stroke="var(--gold-dim)" stroke-width="1.1">
+          <path class="steam s1" d="M10 10 C 8 8, 12 6, 10 3"/>
+          <path class="steam s2" d="M14 10 C 12 8, 16 6, 14 3"/>
+          <path class="steam s3" d="M18 10 C 16 8, 20 6, 18 3"/>
+          <path d="M5 13 h18 v7 a9 9 0 0 1 -9 9 a9 9 0 0 1 -9 -9 Z"/>
+          <path d="M23 15 h4 a3 3 0 0 1 0 6 h-4"/>
+          <line x1="3" y1="27" x2="26" y2="27"/>
+        </svg>
+      </div>
+      <div class="fleuron">❧</div>
+      <div class="eyebrow">A Reading Log</div>
+      <h1>The PRINCE2 Commonplace Book</h1>
+      <div class="subtitle">Eighty-nine lessons toward the Foundation certificate</div>
+      <div class="rule"><div class="diamond"></div></div>
+    </header>
+
+    <div class="seal-row">
+      <div class="seal">
+        <div>
+          <div class="count">${done}</div>
+          <div class="of">OF ${TOTAL} READ</div>
+        </div>
+      </div>
+      <div class="progress-meta">
+        <div class="pct">${pct}% through the volume</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+        <div class="note">${done===TOTAL ? 'The book is closed. Well studied.' : (TOTAL-done)+' lessons remain unread.'}</div>
+      </div>
+    </div>
+
+    ${renderCalendar()}
+
+    <div class="card">
+      <div class="card-title">Table of Contents</div>
+      ${renderLedger()}
+    </div>
+
+    <footer>
+      <div class="fleuron">❧</div>
+      Click a lesson to mark it read, or read again to unmark it.<br>
+      <span class="reset-link" onclick="resetProgress()">erase this book</span>
+    </footer>
+  `;
+
+  requestAnimationFrame(positionRibbon);
+}
+
+function positionRibbon(){
+  const ledger = document.getElementById('ledger');
+  const ribbon = document.getElementById('ribbon');
+  if (!ledger || !ribbon) return;
+  const total = ledger.scrollHeight;
+  const pct = doneCount()/TOTAL;
+  ribbon.style.height = Math.max(24, total*pct) + 'px';
+}
+
+function spawnMotes(){
+  const container = document.getElementById('motes');
+  if (!container) return;
+  const count = window.innerWidth < 560 ? 10 : 18;
+  let html = '';
+  for (let i=0;i<count;i++){
+    const left = Math.random()*100;
+    const size = 2 + Math.random()*2.5;
+    const duration = 14 + Math.random()*16;
+    const delay = Math.random()*-duration;
+    const drift = (Math.random()*40 - 20).toFixed(0) + 'px';
+    html += `<span class="mote" style="left:${left}%; width:${size}px; height:${size}px; animation-duration:${duration}s; animation-delay:${delay}s; --drift:${drift};"></span>`;
+  }
+  container.innerHTML = html;
+}
+
+(async function init(){
+  await loadState();
+  render();
+  spawnMotes();
+})();
+</script>
+</body>
+</html>
