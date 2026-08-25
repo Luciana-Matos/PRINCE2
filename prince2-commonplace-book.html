@@ -731,9 +731,9 @@ function defaultState(){
 
 async function loadState(){
   try{
-    const result = await window.storage.get(STORAGE_KEY, false);
-    if (result && result.value){
-      const parsed = JSON.parse(result.value);
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw){
+      const parsed = JSON.parse(raw);
       // merge to be safe against future lesson-count changes
       const base = defaultState();
       for (const k of Object.keys(base.lessons)){
@@ -744,16 +744,14 @@ async function loadState(){
       state = defaultState();
     }
   }catch(e){
+    console.error('Could not load progress', e);
     state = defaultState();
   }
 }
 
 async function saveState(){
   try{
-    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
-    if (!result){
-      console.error('Storage operation failed');
-    }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){
     console.error('Could not save progress', e);
   }
