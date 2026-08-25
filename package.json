@@ -1,0 +1,9 @@
+{
+  "name": "prince2-commonplace-book",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The PRINCE2 Commonplace Book — a reading log with progress persisted to a Postgres database via Vercel Functions.",
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0"
+  }
+}

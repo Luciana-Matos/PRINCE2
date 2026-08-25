@@ -729,31 +729,59 @@ function defaultState(){
   return { lessons };
 }
 
-async function loadState(){
+function mergeIntoDefault(parsed){
+  const base = defaultState();
+  if (parsed && parsed.lessons){
+    for (const k of Object.keys(base.lessons)){
+      if (parsed.lessons[k]) base.lessons[k] = parsed.lessons[k];
+    }
+  }
+  return base;
+}
+
+function loadLocalFallback(){
   try{
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw){
-      const parsed = JSON.parse(raw);
-      // merge to be safe against future lesson-count changes
-      const base = defaultState();
-      for (const k of Object.keys(base.lessons)){
-        if (parsed.lessons && parsed.lessons[k]) base.lessons[k] = parsed.lessons[k];
-      }
-      state = base;
-    } else {
-      state = defaultState();
-    }
+    return raw ? mergeIntoDefault(JSON.parse(raw)) : defaultState();
   }catch(e){
-    console.error('Could not load progress', e);
-    state = defaultState();
+    console.error('Could not load local progress', e);
+    return defaultState();
+  }
+}
+
+async function loadState(){
+  try{
+    const res = await fetch('/api/progress');
+    if (res.ok){
+      const parsed = await res.json();
+      state = mergeIntoDefault(parsed);
+      // keep a local cache so the book still opens instantly / offline
+      try{ window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+      return;
+    }
+    throw new Error('Bad response: ' + res.status);
+  }catch(e){
+    console.warn('Database unavailable, reading from local storage instead', e);
+    state = loadLocalFallback();
   }
 }
 
 async function saveState(){
+  // always keep a local cache, so nothing is lost if the database is briefly unreachable
   try{
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){
-    console.error('Could not save progress', e);
+    console.error('Could not save progress locally', e);
+  }
+  try{
+    const res = await fetch('/api/progress', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(state)
+    });
+    if (!res.ok) throw new Error('Bad response: ' + res.status);
+  }catch(e){
+    console.warn('Could not save progress to the database (kept locally for now)', e);
   }
 }
 
