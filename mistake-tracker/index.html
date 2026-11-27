@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRINCE2 mistake tracker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#f7f6f2;--card:#ffffff;--ink:#1f1e1c;--ink-2:#5f5e5a;--ink-3:#888780;--line:rgba(0,0,0,.09);--line-2:rgba(0,0,0,.18);
+  --hover:rgba(0,0,0,.05);--neutral:#efede6;
+  --red:#d64545;--red-bg:#fcebeb;--red-ink:#a32d2d;--red-line:#f0b5b5;
+  --green:#3b8a2a;--green-bg:#eaf3de;--green-ink:#3b6d11;--green-line:#bcd896;
+  --radius:8px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#1a1a19;--card:#242423;--ink:#ecebe7;--ink-2:#a9a8a2;--ink-3:#7c7b76;--line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.2);
+  --hover:rgba(255,255,255,.06);--neutral:#2c2c2a;
+  --red:#e2615f;--red-bg:#3a2020;--red-ink:#f4a3a3;--red-line:#6b3434;
+  --green:#6fae4a;--green-bg:#223019;--green-ink:#a9d77f;--green-line:#3f5c2b}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.55}
+main{max-width:980px;margin:0 auto;padding:28px 18px 80px}
+h1{font-size:24px;font-weight:600;margin:0 0 4px}
+.sub{color:var(--ink-2);margin:0 0 22px;font-size:14px}
+h2{font-size:16px;font-weight:600;margin:28px 0 10px}
+button,select,input,textarea{font:inherit;color:var(--ink)}
+button{background:transparent;border:0.5px solid var(--line-2);border-radius:var(--radius);padding:6px 12px;cursor:pointer;font-size:13px}
+button:hover{background:var(--hover)}
+button.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=text],input[type=number],select,textarea{background:var(--card);border:0.5px solid var(--line-2);border-radius:var(--radius);padding:7px 10px;font-size:14px;width:100%}
+textarea{resize:vertical;min-height:60px}
+label.chk{font-size:13px;color:var(--ink-2);display:flex;align-items:center;gap:6px;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:var(--neutral);border-radius:var(--radius);padding:12px 14px}
+.stat .k{font-size:12px;color:var(--ink-2)}.stat .v{font-size:26px;font-weight:600}
+.hm{display:grid;gap:4px;font-size:13px}
+.hc{padding:8px 6px;border-radius:var(--radius);text-align:center;font-weight:600}
+.hh{color:var(--ink-2);font-size:12px;padding:4px 6px;text-align:center;cursor:pointer;border-radius:var(--radius)}
+.rl{padding:8px 10px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:8px}
+.rl:hover,.hh:hover,.op.live:hover,.chip:hover{background:var(--hover)}
+.sel{outline:1.5px solid var(--ink)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.bar{height:6px;border-radius:3px;background:var(--neutral);overflow:hidden;margin-top:4px}
+.bar>div{height:100%;transition:width .4s}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;padding:5px 10px;border-radius:var(--radius);cursor:pointer;border:0.5px solid var(--line-2);display:flex;gap:6px;align-items:center}
+.chip .n{font-size:11px;color:var(--ink-3)}
+.legend{font-size:12px;color:var(--ink-2);margin-top:8px;display:none}
+.legend.show{display:block}
+.legend div{margin:2px 0}
+.toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:22px 0 10px}
+.toolbar .right{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.card{background:var(--card);border:0.5px solid var(--line);border-left:3px solid;border-radius:0 12px 12px 0;padding:10px 12px;cursor:pointer}
+.card.open{grid-column:1/-1;cursor:default}
+.card.done{background:var(--green-bg)}
+.tags{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.tag{font-size:11px;padding:2px 7px;border-radius:var(--radius);max-width:100%}
+.r{font-size:13px;line-height:1.45;margin:6px 0 0}
+.l{color:var(--ink-2);font-size:11px;display:block}
+.op{font-size:14px;line-height:1.45;padding:8px 10px;border-radius:var(--radius);border:0.5px solid var(--line);margin-top:6px;display:flex;gap:8px}
+.op.live{cursor:pointer}
+.ok{background:var(--green-bg);color:var(--green-ink);border-color:var(--green-line)}
+.bad{background:var(--red-bg);color:var(--red-ink);border-color:var(--red-line)}
+.quiz .blur{filter:blur(6px)}
+.pop{display:inline-block;animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.3)}}
+.panel{background:var(--card);border:0.5px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:12px;display:none}
+.panel.show{display:block}
+.form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px}
+.form .full{grid-column:1/-1}.form .half{grid-column:span 2}
+.form label{font-size:12px;color:var(--ink-2);display:block;margin-bottom:3px}
+.err{color:var(--red-ink);font-size:13px;margin-top:8px;min-height:18px}
+.note{font-size:12px;color:var(--ink-3)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.form{grid-template-columns:1fr 1fr}.form .half{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<main>
+<h1>PRINCE2 mistake tracker</h1>
+<p class="sub">Every wrong answer from my PRINCE2 7 Foundation mock tests, by topic and by type of error. Turn on quiz mode and get a question right to bring the count down.</p>
+
+<div class="stats">
+  <div class="stat"><div class="k">Left to fix</div><div class="v"><span id="sLeft">0</span><span style="font-size:14px;color:var(--ink-3)"> / <span id="sTot">0</span></span></div></div>
+  <div class="stat"><div class="k">Fixed</div><div class="v" style="color:var(--green-ink)" id="sFixed">0</div></div>
+  <div class="stat"><div class="k">Progress</div><div class="v" id="sPct">0%</div></div>
+  <div class="stat"><div class="k">Biggest error type left</div><div class="v" style="font-size:16px;margin-top:6px" id="sTop">-</div></div>
+</div>
+
+<h2>Mistakes by topic and test</h2>
+<div class="hm" id="hm"></div>
+<p class="note" style="margin-top:6px">Click a topic or a test to filter. Darker red = more mistakes in that test.</p>
+
+<h2 style="display:flex;align-items:center;gap:8px">Type of error <button id="legBtn" style="padding:2px 8px;font-size:12px"><i class="ti ti-info-circle"></i> What do these mean?</button></h2>
+<div class="chips" id="chips"></div>
+<div class="legend" id="legend"></div>
+
+<div class="toolbar">
+  <span id="lab" style="font-size:15px;font-weight:600"></span>
+  <span class="right">
+    <label class="chk"><input type="checkbox" id="hideF"> Hide fixed</label>
+    <label class="chk"><input type="checkbox" id="quiz"> Quiz mode</label>
+    <button id="addBtn" class="primary"><i class="ti ti-plus"></i> Add question</button>
+    <button id="toolsBtn"><i class="ti ti-database"></i> Data</button>
+  </span>
+</div>
+
+<div class="panel" id="formPanel">
+  <div style="display:flex;justify-content:space-between;align-items:center"><strong id="formTitle">Add a question</strong><button id="formClose" aria-label="Close"><i class="ti ti-x"></i></button></div>
+  <p class="note">Only test, number, topic and error type are required. Fill the options to quiz yourself on it later.</p>
+  <div class="form">
+    <div><label for="fTest">Test</label><input type="text" id="fTest" list="testList" placeholder="MT5"><datalist id="testList"></datalist></div>
+    <div><label for="fQ">Question number</label><input type="number" id="fQ" min="1" step="1" placeholder="12"></div>
+    <div><label for="fTopic">Topic</label><select id="fTopic"></select></div>
+    <div><label for="fError">Type of error</label><select id="fError"></select></div>
+    <div class="full"><label for="fQuestion">Question</label><textarea id="fQuestion" placeholder="Paste the full question"></textarea></div>
+    <div class="half"><label for="fA">Option a</label><input type="text" id="fA"></div>
+    <div class="half"><label for="fB">Option b</label><input type="text" id="fB"></div>
+    <div class="half"><label for="fC">Option c</label><input type="text" id="fC"></div>
+    <div class="half"><label for="fD">Option d</label><input type="text" id="fD"></div>
+    <div><label for="fPick">Your pick</label><select id="fPick"><option value="-1">Not saved</option><option value="0">a</option><option value="1">b</option><option value="2">c</option><option value="3">d</option></select></div>
+    <div><label for="fCorrect">Correct answer</label><select id="fCorrect"><option value="-1">Not saved</option><option value="0">a</option><option value="1">b</option><option value="2">c</option><option value="3">d</option></select></div>
+    <div class="half"><label for="fTrigger">Trigger words</label><input type="text" id="fTrigger" placeholder="solid foundations"></div>
+    <div class="full"><label for="fWhy">Why / concept to remember</label><textarea id="fWhy" placeholder="Solid foundations = IP. SU only asks whether the project is worthwhile."></textarea></div>
+  </div>
+  <div class="err" id="fErr"></div>
+  <div class="actions"><button class="primary" id="fSave"><i class="ti ti-check"></i> Save</button><button id="fDelete" style="display:none;color:var(--red-ink)"><i class="ti ti-trash"></i> Delete</button></div>
+</div>
+
+<div class="panel" id="toolsPanel">
+  <div style="display:flex;justify-content:space-between;align-items:center"><strong>Your data</strong><button id="toolsClose" aria-label="Close"><i class="ti ti-x"></i></button></div>
+  <p class="note">Questions you add or edit, and your progress, are saved in this browser. To make new questions permanent for every device, export <code>questions.js</code> and replace the file in the repo, or copy the JSON and paste it to Claude.</p>
+  <p class="note" id="customInfo"></p>
+  <div class="actions">
+    <button id="expJs"><i class="ti ti-download"></i> Export questions.js</button>
+    <button id="cpJson"><i class="ti ti-copy"></i> Copy my new questions as JSON</button>
+    <button id="impBtn"><i class="ti ti-upload"></i> Import</button><input type="file" id="impFile" accept=".js,.json" style="display:none">
+    <button id="rstProg"><i class="ti ti-refresh"></i> Reset progress</button>
+    <button id="rstCustom" style="color:var(--red-ink)"><i class="ti ti-trash"></i> Discard my unsaved edits</button>
+  </div>
+  <div class="err" id="tMsg" style="color:var(--green-ink)"></div>
+</div>
+
+<div class="grid" id="grid"></div>
+</main>
+
+<script src="questions.js"></script>
+<script>
+const TOPICS={P:["Process purposes","#D85A30"],L:["Definitions","#7F77DD"],K:["Technique steps","#1D9E75"],M:["Products and reports","#378ADD"],W:["Who decides","#BA7517"],E:["People and principles","#D4537E"]};
+const ERRORS={
+  timing:["Wrong timing","#c2410c","Picked an earlier or later step or process"],
+  umbrella:["Umbrella term","#7c3aed","Picked the broad term instead of the precise one"],
+  lookalike:["Look-alike term","#0e7490","Mixed up two similar-sounding terms"],
+  owner:["Wrong owner","#b45309","Picked the wrong role (who approves, recommends, raises)"],
+  inside:["Inside vs outside","#15803d","Mixed up work done by the project with work done outside it"],
+  notasked:["True but not asked","#be185d","Picked a true statement about something else"],
+  oneword:["One wrong word","#b91c1c","Missed the word that made an option wrong"],
+  keyword:["Missed key word","#1d4ed8","Missed the word in the question that gives the answer"],
+  notq:["NOT question","#4b5563","Forgot the question asked for the odd one out"]
+};
+const LT="abcd",K={fixed:"p2mt.fixed",custom:"p2mt.custom"};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const idOf=d=>d.test+"-"+d.q;
+const BASE=(window.PRINCE2_QUESTIONS||[]).map(d=>({...d}));
+let custom=store.get(K.custom,[]);
+let fixed=new Set(store.get(K.fixed,[]));
+let ft=null,fm=null,fe=null,quiz=false,hideF=false,editing=null;
+const open=new Set(),picked={},shown=new Set();
+let D=[];
+
+function merge(){
+  const map=new Map();BASE.forEach(d=>map.set(idOf(d),{...d,_src:"base"}));
+  custom.forEach(c=>{const id=idOf(c);if(c.deleted){map.delete(id);return}map.set(id,{...c,_src:map.has(id)?"edited":"new"})});
+  D=[...map.values()].sort((a,b)=>tests().indexOf(a.test)-tests().indexOf(b.test)||a.test.localeCompare(b.test,undefined,{numeric:true})||a.q-b.q);
+  const ids=new Set(D.map(idOf));fixed=new Set([...fixed].filter(x=>ids.has(x)));
+}
+function tests(){const s=new Set();BASE.forEach(d=>s.add(d.test));custom.forEach(d=>!d.deleted&&s.add(d.test));return [...s].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}))}
+const repeatKey=d=>(d.question||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+function repeats(){const c={};D.forEach(d=>{const k=repeatKey(d);if(k.length>20)c[k]=(c[k]||0)+1});return c}
+const saveFixed=()=>store.set(K.fixed,[...fixed]);
+const saveCustom=()=>store.set(K.custom,custom);
+
+const hm=document.getElementById("hm"),g=document.getElementById("grid");
+const cnt=(k,m)=>D.filter(d=>d.topic===k&&d.test===m).length;
+
+function stats(pop){
+  const left=D.filter(d=>!fixed.has(idOf(d))).length;
+  const sl=document.getElementById("sLeft");sl.textContent=left;if(pop){sl.classList.remove("pop");void sl.offsetWidth;sl.classList.add("pop")}
+  document.getElementById("sTot").textContent=D.length;
+  document.getElementById("sFixed").textContent=D.length-left;
+  document.getElementById("sPct").textContent=(D.length?Math.round((D.length-left)/D.length*100):0)+"%";
+  const ec={};D.filter(d=>!fixed.has(idOf(d))).forEach(d=>ec[d.error]=(ec[d.error]||0)+1);
+  const top=Object.entries(ec).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById("sTop").innerHTML=top?'<span style="color:'+ERRORS[top[0]][1]+'">'+ERRORS[top[0]][0]+"</span> ("+top[1]+")":"None left";
+}
+
+function heat(popK){
+  const T=tests();hm.style.gridTemplateColumns="minmax(0,2fr) repeat("+T.length+",minmax(0,0.8fr)) minmax(0,1fr) minmax(0,1.6fr)";
+  let h="<div></div>"+T.map(m=>'<div class="hh'+(fm===m?" sel":"")+'" data-m="'+esc(m)+'">'+esc(m)+"</div>").join("")+'<div class="hh" style="cursor:default">Trend</div><div class="hh" style="cursor:default">Left to fix</div>';
+  Object.entries(TOPICS).forEach(([k,v])=>{
+    const tot=D.filter(d=>d.topic===k).length,left=D.filter(d=>d.topic===k&&!fixed.has(idOf(d))).length;
+    h+='<div class="rl'+(ft===k?" sel":"")+'" data-t="'+k+'"><span class="dot" style="background:'+v[1]+'"></span>'+v[0]+"</div>";
+    h+=T.map(m=>{const n=cnt(k,m);return '<div class="hc" style="background:'+(n?"color-mix(in srgb, var(--red) "+Math.min(14+n*17,88)+"%, transparent)":"var(--green-bg)")+";color:"+(n>2?"#fff":"var(--ink)")+'">'+n+"</div>"}).join("");
+    const a=cnt(k,T[0]),z=cnt(k,T[T.length-1]);
+    const tr=T.length<2?["",""]:z===0?['<i class="ti ti-check"></i> Fixed',"var(--green-ink)"]:z<a?['<i class="ti ti-trending-down"></i> Better',"var(--green-ink)"]:['<i class="ti ti-alert-triangle"></i> Still there',"var(--red-ink)"];
+    h+='<div class="hc" style="font-weight:400;font-size:12px;color:'+tr[1]+'">'+tr[0]+"</div>";
+    h+='<div class="hc" style="text-align:left;padding:6px 8px;font-weight:400;background:'+(tot&&left===0?"var(--green-bg)":"transparent")+'"><span class="'+(popK===k?"pop":"")+'" style="font-weight:600;font-size:15px;color:'+(left===0?"var(--green-ink)":"var(--ink)")+'">'+(tot&&left===0?'<i class="ti ti-check"></i> 0':left)+'</span><span style="color:var(--ink-3);font-size:12px"> / '+tot+'</span><div class="bar"><div style="width:'+(tot?Math.round(left/tot*100):0)+"%;background:"+(left===0?"var(--green)":"var(--red)")+'"></div></div></div>';
+  });
+  hm.innerHTML=h;
+  hm.querySelectorAll("[data-t]").forEach(e=>e.onclick=()=>{ft=ft===e.dataset.t?null:e.dataset.t;heat();draw()});
+  hm.querySelectorAll("[data-m]").forEach(e=>e.onclick=()=>{fm=fm===e.dataset.m?null:e.dataset.m;heat();draw()});
+}
+
+function chips(){
+  const c=document.getElementById("chips");
+  c.innerHTML=Object.entries(ERRORS).map(([k,v])=>{const tot=D.filter(d=>d.error===k).length;if(!tot)return "";const left=D.filter(d=>d.error===k&&!fixed.has(idOf(d))).length;
+    return '<span class="chip'+(fe===k?" sel":"")+'" data-e="'+k+'"><span class="dot" style="background:'+v[1]+'"></span>'+v[0]+'<span class="n">'+left+"/"+tot+"</span></span>"}).join("");
+  c.querySelectorAll("[data-e]").forEach(e=>e.onclick=()=>{fe=fe===e.dataset.e?null:e.dataset.e;chips();draw()});
+  document.getElementById("legend").innerHTML=Object.values(ERRORS).map(v=>'<div><span class="dot" style="display:inline-block;background:'+v[1]+';margin-right:6px"></span><strong>'+v[0]+"</strong>: "+v[2]+"</div>").join("")+'<div style="margin-top:4px">Types marked "est." were estimated because the pick wasn’t saved.</div>';
+}
+
+function tag(bg,color,txt){return '<span class="tag" style="background:'+bg+";color:"+color+'">'+txt+"</span>"}
+function soft(hex){return "color-mix(in srgb, "+hex+" 16%, transparent)"}
+
+function body(d,id,rep){
+  const t=TOPICS[d.topic]||["Other","#888"],e=ERRORS[d.error]||["Other","#888",""],isF=fixed.has(id),isOpen=open.has(id),hasQ=d.question&&d.options&&d.options.length;
+  let h='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px"><span style="font-weight:600;font-size:14px;white-space:nowrap">'+esc(d.test)+" · Q"+esc(d.q)+'</span><span class="tags">';
+  if(isF)h+=tag("var(--green)","#fff",'<i class="ti ti-check"></i> Fixed');
+  if(rep)h+=tag("var(--red-bg)","var(--red-ink)","Same Q, wrong "+rep+"x");
+  if(d._src==="new")h+=tag("var(--neutral)","var(--ink-2)","Added by you");
+  h+=tag(soft(e[1]),e[1],e[0]+(d.estimated?" (est.)":""));
+  h+=tag(soft(t[1]),t[1],t[0]);
+  if(isOpen)h+='<button data-edit style="padding:1px 7px" aria-label="Edit"><i class="ti ti-pencil"></i></button><button data-close style="padding:1px 7px" aria-label="Close"><i class="ti ti-x"></i></button>';
+  h+="</span></div>";
+  if(d.trigger)h+='<p class="r"><span class="l">Trigger words</span>“'+esc(d.trigger)+"”</p>";
+  if(!isOpen){h+=hasQ?'<p class="r" style="color:var(--ink-2)">'+esc(d.question.slice(0,95))+(d.question.length>95?"…":"")+"</p>":'<p class="r blur" style="color:var(--green-ink)"><span class="l">Concept</span>'+esc(d.why)+"</p>";return h}
+  if(!hasQ){
+    h+='<p class="r" style="color:var(--ink-3)">The question text wasn’t saved. Recall the concept from the trigger words, then check.</p>';
+    if(quiz&&!shown.has(id)&&!isF)return h+'<button data-show style="margin-top:8px">Show concept</button>';
+    h+='<p class="r" style="color:var(--green-ink);font-size:14px"><span class="l">Concept to remember</span>'+esc(d.why)+"</p>";
+    if(quiz&&!isF)h+='<div class="actions"><button data-knew><i class="ti ti-check"></i> I knew it</button><button data-notyet>Not yet</button></div>';
+    return h;
+  }
+  h+='<p style="font-size:15px;line-height:1.6;margin:10px 0 4px;font-weight:600">'+esc(d.question)+"</p>";
+  const p=picked[id],reveal=!quiz||p!==undefined||isF,hasC=d.correct>=0;
+  d.options.forEach((o,i)=>{if(!o)return;let cl="op",ic="";
+    if(reveal){if(i===d.correct){cl+=" ok";ic='<i class="ti ti-check"></i>'}else if((!quiz&&i===d.pick)||(quiz&&i===p)){cl+=" bad";ic='<i class="ti ti-x"></i>'}}else cl+=" live";
+    h+='<div class="'+cl+'" data-o="'+i+'"><span style="font-weight:600">'+LT[i]+'.</span><span style="flex:1">'+esc(o)+(reveal&&!quiz&&i===d.pick?' <span style="font-size:11px">(your pick in the mock)</span>':"")+"</span>"+ic+"</div>"});
+  if(reveal){
+    if(d.why)h+='<p class="r" style="margin-top:10px;font-size:14px"><span class="l">Why</span>'+esc(d.why)+"</p>";
+    if(quiz&&p!==undefined&&hasC)h+='<p class="r" style="font-weight:600;color:'+(p===d.correct?"var(--green-ink)":"var(--red-ink)")+'">'+(p===d.correct?"Got it. One less to fix.":"Still a trap. Read the trigger words again.")+"</p>"+(p!==d.correct?'<button data-retry style="margin-top:6px"><i class="ti ti-refresh"></i> Try again</button>':"");
+  }else h+='<p class="r" style="color:var(--ink-3)">Pick an option to check it.</p>';
+  if(isF)h+='<div class="actions"><button data-unfix style="font-size:12px">Mark as not fixed</button></div>';
+  return h;
+}
+
+function draw(){
+  const rc=repeats();
+  const L=D.filter(d=>(!ft||d.topic===ft)&&(!fm||d.test===fm)&&(!fe||d.error===fe)&&!(hideF&&fixed.has(idOf(d))));
+  const parts=[ft?TOPICS[ft][0]:null,fe?ERRORS[fe][0]:null,fm].filter(Boolean);
+  document.getElementById("lab").textContent=(parts.length?parts.join(" · "):"All mistakes")+" ("+L.length+")";
+  g.innerHTML="";
+  if(!L.length){g.innerHTML='<p class="note">Nothing here. Change the filters or add a question.</p>';return}
+  L.forEach(d=>{const id=idOf(d);const e=document.createElement("div");
+    e.className="card"+(open.has(id)?" open":"")+(fixed.has(id)?" done":"");
+    e.style.borderLeftColor=fixed.has(id)?"var(--green)":(TOPICS[d.topic]||["","#888"])[1];
+    const r=rc[repeatKey(d)];e.innerHTML=body(d,id,r>1?r:0);
+    e.onclick=ev=>{const tg=ev.target;
+      if(tg.closest("[data-close]")){open.delete(id);delete picked[id];shown.delete(id);draw();return}
+      if(tg.closest("[data-edit]")){openForm(d);return}
+      if(tg.closest("[data-retry]")){delete picked[id];draw();return}
+      if(tg.closest("[data-show]")){shown.add(id);draw();return}
+      if(tg.closest("[data-knew]")){fix(id,d.topic);return}
+      if(tg.closest("[data-notyet]")){shown.delete(id);open.delete(id);draw();return}
+      if(tg.closest("[data-unfix]")){fixed.delete(id);saveFixed();delete picked[id];refresh();return}
+      const o=tg.closest("[data-o]");
+      if(o&&quiz&&picked[id]===undefined&&!fixed.has(id)){const v=+o.dataset.o;picked[id]=v;if(v===d.correct){fix(id,d.topic)}else draw();return}
+      if(!open.has(id)){open.add(id);draw()}};
+    g.appendChild(e)});
+}
+function fix(id,topic){fixed.add(id);saveFixed();heat(topic);chips();stats(true);draw()}
+function refresh(){merge();heat();chips();stats();draw();
+  document.getElementById("testList").innerHTML=tests().map(t=>'<option value="'+esc(t)+'">').join("");
+  const n=custom.length;document.getElementById("customInfo").textContent=n?n+" question change(s) saved only in this browser so far.":"No unsaved changes: everything matches questions.js.";
+}
+
+const F=id=>document.getElementById(id);
+F("fTopic").innerHTML=Object.entries(TOPICS).map(([k,v])=>'<option value="'+k+'">'+v[0]+"</option>").join("");
+F("fError").innerHTML=Object.entries(ERRORS).map(([k,v])=>'<option value="'+k+'">'+v[0]+"</option>").join("");
+function openForm(d){
+  editing=d?idOf(d):null;F("formTitle").textContent=d?"Edit "+d.test+" Q"+d.q:"Add a question";
+  const last=tests();F("fTest").value=d?d.test:(F("fTest").value||last[last.length-1]||"");F("fQ").value=d?d.q:"";
+  F("fTopic").value=d?d.topic:"P";F("fError").value=d?d.error:"timing";F("fQuestion").value=d?d.question||"":"";
+  ["fA","fB","fC","fD"].forEach((k,i)=>F(k).value=d&&d.options?d.options[i]||"":"");
+  F("fPick").value=d?d.pick:-1;F("fCorrect").value=d?d.correct:-1;F("fTrigger").value=d?d.trigger||"":"";F("fWhy").value=d?d.why||"":"";
+  F("fErr").textContent="";F("fDelete").style.display=d?"inline-flex":"none";
+  F("formPanel").classList.add("show");F("toolsPanel").classList.remove("show");F("formPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+F("addBtn").onclick=()=>openForm(null);
+F("formClose").onclick=()=>F("formPanel").classList.remove("show");
+document.querySelectorAll("#formPanel input,#formPanel textarea,#formPanel select").forEach(x=>x.addEventListener("input",()=>F("fErr").textContent=""));
+F("fSave").onclick=()=>{
+  const test=F("fTest").value.trim(),q=parseInt(F("fQ").value,10);
+  if(!test){F("fErr").textContent="Enter the test name, for example MT5.";return}
+  if(!q||q<1){F("fErr").textContent="Enter the question number.";return}
+  const opts=["fA","fB","fC","fD"].map(k=>F(k).value.trim()),hasOpts=opts.some(Boolean),correct=+F("fCorrect").value,pick=+F("fPick").value;
+  if(hasOpts&&correct<0){F("fErr").textContent="Choose the correct answer, or clear the options.";return}
+  if(hasOpts&&!F("fQuestion").value.trim()){F("fErr").textContent="Add the question text to go with the options.";return}
+  if(correct>=0&&!opts[correct]){F("fErr").textContent="The correct option is empty.";return}
+  if(!hasOpts&&!F("fWhy").value.trim()){F("fErr").textContent="Without options, add the concept to remember so you can self-check.";return}
+  const id=test+"-"+q;
+  if(id!==editing&&D.some(d=>idOf(d)===id)){F("fErr").textContent=test+" Q"+q+" already exists. Open it and use edit instead.";return}
+  const entry={test,q,topic:F("fTopic").value,error:F("fError").value,trigger:F("fTrigger").value.trim(),question:F("fQuestion").value.trim(),options:hasOpts?opts:[],pick:hasOpts?pick:-1,correct:hasOpts?correct:-1,why:F("fWhy").value.trim()};
+  if(editing&&editing!==id){custom=custom.filter(c=>idOf(c)!==editing);if(BASE.some(b=>idOf(b)===editing))custom.push({...BASE.find(b=>idOf(b)===editing),deleted:true});fixed.delete(editing);saveFixed()}
+  custom=custom.filter(c=>idOf(c)!==id);custom.push(entry);saveCustom();
+  F("formPanel").classList.remove("show");open.add(id);editing=null;refresh();
+};
+F("fDelete").onclick=()=>{if(!editing)return;const d=D.find(x=>idOf(x)===editing);if(!confirmDelete(d))return;
+  custom=custom.filter(c=>idOf(c)!==editing);if(BASE.some(b=>idOf(b)===editing))custom.push({test:d.test,q:d.q,deleted:true});
+  saveCustom();fixed.delete(editing);saveFixed();open.delete(editing);F("formPanel").classList.remove("show");editing=null;refresh()};
+let delArmed=null;
+function confirmDelete(d){const id=idOf(d);if(delArmed===id){delArmed=null;return true}delArmed=id;F("fErr").textContent="Press delete again to remove "+d.test+" Q"+d.q+".";return false}
+
+F("toolsBtn").onclick=()=>{F("toolsPanel").classList.toggle("show");F("formPanel").classList.remove("show");F("tMsg").textContent=""};
+F("toolsClose").onclick=()=>F("toolsPanel").classList.remove("show");
+F("legBtn").onclick=()=>F("legend").classList.toggle("show");
+function clean(d){const o={test:d.test,q:d.q,topic:d.topic,error:d.error};if(d.estimated)o.estimated=true;Object.assign(o,{trigger:d.trigger||"",question:d.question||"",options:d.options||[],pick:d.pick??-1,correct:d.correct??-1,why:d.why||""});return o}
+F("expJs").onclick=()=>{
+  const head=document.querySelector('script[src="questions.js"]')?"":"";
+  const txt="// PRINCE2 7 Foundation mistake tracker: question data.\n// Exported from the tracker page on "+new Date().toISOString().slice(0,10)+". Replace mistake-tracker/questions.js with this file.\n// See the comments in the original file for the meaning of each field.\n\nwindow.PRINCE2_QUESTIONS = [\n"+D.map(d=>"  "+JSON.stringify(clean(d))).join(",\n")+"\n];\n";
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/javascript"}));a.download="questions.js";a.click();
+  F("tMsg").textContent="Downloaded questions.js with "+D.length+" questions. Replace the file in the repo, then use Discard my unsaved edits.";
+};
+F("cpJson").onclick=async()=>{const n=custom.filter(c=>!c.deleted).map(clean);const txt=JSON.stringify(n,null,1);
+  try{await navigator.clipboard.writeText(txt);F("tMsg").textContent="Copied "+n.length+" question(s). Paste them to Claude to add them to the repo."}
+  catch(e){F("tMsg").textContent="Couldn’t copy automatically. Use Export questions.js instead."}};
+F("impBtn").onclick=()=>F("impFile").click();
+F("impFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=await f.text();
+  try{const s=t.indexOf("["),en=t.lastIndexOf("]");const arr=JSON.parse(t.slice(s,en+1).replace(/,\s*\]/,"]"));
+    if(!Array.isArray(arr))throw 0;let n=0;arr.forEach(x=>{if(x&&x.test&&x.q){custom=custom.filter(c=>idOf(c)!==idOf(x));custom.push(x);n++}});saveCustom();refresh();F("tMsg").textContent="Imported "+n+" question(s)."}
+  catch(err){F("tMsg").textContent="";F("tMsg").insertAdjacentHTML("beforeend",'<span style="color:var(--red-ink)">That file couldn’t be read. Use a file exported from this page, or a JSON list.</span>')}
+  e.target.value=""};
+F("rstProg").onclick=()=>{fixed.clear();saveFixed();Object.keys(picked).forEach(k=>delete picked[k]);shown.clear();refresh();F("tMsg").textContent="Progress reset."};
+let rstArm=false;
+F("rstCustom").onclick=()=>{if(!rstArm){rstArm=true;F("tMsg").innerHTML='<span style="color:var(--red-ink)">This removes questions you added or edited in this browser. Press again to confirm.</span>';return}
+  rstArm=false;custom=[];saveCustom();refresh();F("tMsg").textContent="Back to questions.js."};
+
+F("quiz").onchange=e=>{quiz=e.target.checked;g.classList.toggle("quiz",quiz);Object.keys(picked).forEach(k=>delete picked[k]);shown.clear();draw()};
+F("hideF").onchange=e=>{hideF=e.target.checked;draw()};
+refresh();
+</script>
+</body>
+</html>
